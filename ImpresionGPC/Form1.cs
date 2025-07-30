@@ -253,43 +253,43 @@ namespace ImpresionGPC
         private string GenerarZpl(string nombreProducto, DateTime fechaEnvasado, DateTime fechaVencimiento, string lugarEntrega, string codigoBarra, string nombreEmpleado)
         {
             string zpl = "^XA\n";
-            // Ancho de la etiqueta 
+            // Ancho de la etiqueta
             zpl += "^PW400\n";
-            // Origen de la etiqueta 
-            zpl += "^LH20,20\n"; 
+            // Origen de la etiqueta
+            zpl += "^LH20,20\n";
 
-            // LUGAR DE ENTREGA (ARRIBA Y CENTRADO, AJUSTADO ) 
+            // LUGAR DE ENTREGA (ARRIBA Y CENTRADO, AJUSTADO )
             if (!string.IsNullOrEmpty(lugarEntrega))
             {
                 // Tamaño de fuente
-                zpl += "^CF0,30\n";  
-                                    
-                zpl += "^FO0,5^FB360,40,1,C^FDLUGAR: " + lugarEntrega + "^FS\n"; 
+                zpl += "^CF0,30\n";
+                // ^FO0,5. Mantenemos 5 para que no se salga del margen superior.
+                zpl += "^FO0,5^FB360,40,1,C^FDLUGAR: " + lugarEntrega + "^FS\n";
             }
-            // Fuente por defecto, altura 25 
-            zpl += "^CF0,25\n"; 
-                                
-            zpl += "^FO10,55^FD" + nombreEmpleado + "^FS\n"; 
-
-            
-            zpl += "^CF0,25\n"; 
-                                
-            zpl += "^FO10,90^FDMenu: " + nombreProducto + "^FS\n"; 
-
-            // Fecha de Elaboración 
+            // Fuente por defecto, altura 25
             zpl += "^CF0,25\n";
-            
-            zpl += "^FO10,125^FDELAB: " + fechaEnvasado.ToString("dd/MM/yyyy") + "^FS\n"; 
+            // ^FO10,45 (55 - 10)
+            zpl += "^A0,30,30^FO10,45^FD" + nombreEmpleado + "^FS\n";
 
-            // Fecha de Vencimiento 
+
             zpl += "^CF0,25\n";
-            
-            zpl += "^FO10,160^FDVENC: " + fechaVencimiento.ToString("dd/MM/yyyy") + "^FS\n"; 
+            //  ^FO10,80 (90 - 10)
+            zpl += "^FO10,80^FDMenu: " + nombreProducto + "^FS\n";
+
+            // Fecha de Elaboración
+            zpl += "^CF0,25\n";
+            //  ^FO10,115 (125 - 10)
+            zpl += "^FO10,115^FDELAB: " + fechaEnvasado.ToString("dd/MM/yyyy") + "^FS\n";
+
+            // Fecha de Vencimiento
+            zpl += "^CF0,25\n";
+            // ^FO10,150 (160 - 10)
+            zpl += "^FO10,150^FDVENC: " + fechaVencimiento.ToString("dd/MM/yyyy") + "^FS\n";
 
 
-            //  CÓDIGO DE BARRAS EAN-13 
+            // CÓDIGO DE BARRAS EAN-13
 
-            //  Limpiar el string para asegurar que solo contenga dígitos.
+            // Limpiar el string para asegurar que solo contenga dígitos.
             string cleanedCodigoBarra = new string(codigoBarra.Where(char.IsDigit).ToArray());
 
             string baseCodigoBarra;
@@ -304,7 +304,8 @@ namespace ImpresionGPC
 
             if (string.IsNullOrEmpty(baseCodigoBarra) || baseCodigoBarra.Length != 12)
             {
-                zpl += "^FO0,280^FDERROR: DATOS DE CODIGO DE BARRA INVALIDOS^FS\n";
+                //  ^FO0,270 (280 - 10)
+                zpl += "^FO0,270^FDERROR: DATOS DE CODIGO DE BARRA INVALIDOS^FS\n";
                 zpl += "^XZ\n";
                 return zpl;
             }
@@ -316,26 +317,29 @@ namespace ImpresionGPC
             }
             catch (ArgumentException ex)
             {
-                zpl += $"^FO0,280^FDERROR BC CHKSUM: {ex.Message.Replace("\n", " ")}^FS\n";
+                //  ^FO0,270 (280 - 10)
+                zpl += $"^FO0,270^FDERROR BC CHKSUM: {ex.Message.Replace("\n", " ")}^FS\n";
                 zpl += "^XZ\n";
                 return zpl;
             }
             catch (FormatException ex)
             {
-                zpl += $"^FO0,280^FDERROR BC FORMAT: {ex.Message.Replace("\n", " ")}^FS\n";
+                //  ^FO0,270 (280 - 10) 
+                zpl += $"^FO0,270^FDERROR BC FORMAT: {ex.Message.Replace("\n", " ")}^FS\n";
                 zpl += "^XZ\n";
                 return zpl;
             }
 
             string fullEan13 = baseCodigoBarra + checkDigit;
 
-            // Reducimos el module width a 2.  La altura la mantenemos en 130.
-            zpl += "^BY2,3.0,120^FS\n"; 
+            // Reducimos el module width a 2. La altura la mantenemos en 120.
+            zpl += "^BY2,3.0,120^FS\n";
 
-            zpl += "^FO40,185^BE,Y,Y\n"; 
+            //  ^FO40,175 (185 - 10)
+            zpl += "^FO80,175^BE,Y,Y\n";  //FO80 centra el código de barras en la etiqueta de la etiqueta
             zpl += "^FD" + fullEan13 + "^FS\n";
 
-            zpl += "^XZ\n"; 
+            zpl += "^XZ\n";
             return zpl;
             // Finaliza el formato ZPL
         }

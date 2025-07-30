@@ -1,0 +1,29 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Binaries
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+*.pdb
+*.exe
+*.dll
+
+# Publish / ClickOnce files
+app.publish/
+*.application
+*.manifest
+setup.exe
+
+# Packages
+packages/
+*.nupkg
+*.snk
+
+# Other common temporary files
+*.log
+*.bak
